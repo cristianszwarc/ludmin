@@ -1,0 +1,26 @@
+class Config(object):
+    #default config files for all environments
+    DEBUG = False
+    SECRET_KEY='secret'
+    APP_NAME = 'Users API'
+    MONGO_DBNAME = 'dbname'
+    MONGO_URI = 'mongodb://user:pass@host:port/dbname'
+
+    # token timeouts
+    TOKEN_TIMEOUT = 300
+
+class DevelopmentConfig(Config):
+    DEBUG = True
+    TOKEN_TIMEOUT = 3000
+
+class ProductionConfig(Config):
+    pass
+
+class TestingConfig(Config):
+    DEBUG = True
+
+config = {
+    'development': DevelopmentConfig,
+    'production': ProductionConfig,
+    'testing': TestingConfig
+}
