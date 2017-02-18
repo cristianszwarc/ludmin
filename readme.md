@@ -9,7 +9,7 @@ Use
 
 **Public Token**
 
-get a public JWT token for a device (if device_id is not 32 chars, a device id will be generated)
+get a public JWT token for a device (if device_id is not 32 chars, a device id will be generated, this is not stored anywhere)
 ```
 POST /tokens/public
 Content-Type: application/json
@@ -19,6 +19,7 @@ Content-Type: application/json
 ```
 
 **Login**
+
 get a logged-in JWT token
 ```
 POST /tokens
@@ -32,6 +33,7 @@ Authorization: <token>
 ```
 
 **Refresh Token**
+
 Get a new token, for logged-in tokens the process will check if the device is still logged for the user.  
 ```
 GET /tokens/<device_id>
@@ -40,6 +42,7 @@ Authorization: <token>
 ```
 
 **Logout**
+
 The device will be logged-out from the user's account
 ```
 DELETE /tokens/<device_id>
