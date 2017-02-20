@@ -1,9 +1,8 @@
 class Config(object):
     #default config files for all environments
     DEBUG = False
-    SECRET_KEY='secret'
+    SECRET_KEY='notsosecret1234567890987654321'
     APP_NAME = 'Users API'
-    MONGO_DBNAME = 'dbname'
     MONGO_URI = 'mongodb://user:pass@host:port/dbname'
 
     # token timeouts

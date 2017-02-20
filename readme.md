@@ -91,6 +91,15 @@ Installation
   pip3 install -r requirements.txt
 ```
 
+#### Config ####
+Duplicate `config.py.dist` into `config.py` and adjust the fields for your environment.
+```
+    DEBUG = False
+    SECRET_KEY='notSoSecret'
+    APP_NAME = 'Users API'
+    MONGO_URI = 'mongodb://user:pass@host:port/dbname'
+```
+
 #### Run ####
 ```
   python3 manage.py runserver
