@@ -30,7 +30,7 @@ class PublicTokensResource(Resource):
         if not device_id or len(device_id) != 32:
             device_id = uuid.uuid4().hex
 
-        public_token = g.token.generate_public(device_id)
+        public_token = g.token.generate_public(device_id, ['public'])
         return {'success': True, 'device_id': device_id, 'token': public_token.decode('utf-8') }
 
 class TokensResource(Resource):
@@ -79,12 +79,12 @@ class TokensResource(Resource):
 
                 # issue fresh token
                 token_type = 'Refresh'
-                new_token = g.token.generate_logged(user_for_device, device_id)
+                new_token = g.token.generate_logged(user_for_device, device_id, ['basics', 'master'])
 
         # if a new token was not created, issue a new public token by default
         if not new_token:
             token_type = 'Public'
-            new_token = g.token.generate_public(device_id)
+            new_token = g.token.generate_public(device_id, ['public'])
 
         return {'success': True, 'token': new_token.decode('utf-8'), 'type': token_type}
 
@@ -134,7 +134,7 @@ class TokensResource(Resource):
             mongo.db.users.save(user)
 
         # generate logged-in JWT
-        encoded = g.token.generate_logged(user, device_id)
+        encoded = g.token.generate_logged(user, device_id, ['basics', 'master'])
 
         # return the logged-in token
         return {

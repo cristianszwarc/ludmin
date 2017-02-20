@@ -37,7 +37,6 @@ Authorization: <token>
 Get a new token, for logged-in tokens the process will check if the device is still logged for the user.  
 ```
 GET /tokens/<device_id>
-Content-Type: application/json
 Authorization: <token>
 ```
 
@@ -48,6 +47,29 @@ The device will be logged-out from the user's account
 DELETE /tokens/<device_id>
 Content-Type: application/json
 Authorization: <token>
+```
+
+**New User**
+
+Is required to get a public token for this action
+```
+POST /users
+Content-Type: application/json
+Authorization: <token>
+{
+  "full_name": "Jhon Doe",
+  "email": "jhon@doe.com",
+  "password" : "123123",
+  "password_confirmation" : "123123"
+} 
+```
+
+**List Users**
+
+Is required to get a master token for this action
+```
+GET /users
+Content-Type: application/json
 ```
 
 Installation
@@ -67,7 +89,10 @@ Installation
 #### Install ####
 ```
   pip3 install -r requirements.txt
-  
+```
+
+#### Run ####
+```
   python3 manage.py runserver
 ```
 

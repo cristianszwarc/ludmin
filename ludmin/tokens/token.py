@@ -50,16 +50,16 @@ class Token:
         payload['exp'] = datetime.utcnow() + timedelta(seconds=self.config['TOKEN_TIMEOUT'])
         return jwt.encode(payload, self.config['SECRET_KEY'], algorithm='HS256')
 
-    def generate_public(self, device_id):
+    def generate_public(self, device_id, allowed):
         return self.generate({
                 'device_id': device_id,
-                'allowed': ['public'],
+                'allowed': allowed,
             })
 
-    def generate_logged(self, user_for_device, device_id):
+    def generate_logged(self, user_for_device, device_id, allowed):
         return self.generate({
             'device_id': device_id,
             '_id': str(user_for_device.get('_id')),
             'email': user_for_device.get('email'),
-            'allowed': ['basics', 'team_creation', 'plans', 'master']
+            'allowed': allowed
         })

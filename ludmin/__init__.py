@@ -21,6 +21,9 @@ def create_app(config_name=None):
     from .tokens.resources import tokens_bp
     app.register_blueprint(tokens_bp, url_prefix='/tokens')
 
+    from .users.resources import users_bp
+    app.register_blueprint(users_bp, url_prefix='/users')
+
     # custom handlers
     @app.errorhandler(500)
     def internal_server_error(error):
