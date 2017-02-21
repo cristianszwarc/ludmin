@@ -97,6 +97,7 @@ Content-Type: application/json
 ```
 
 *email*
+
 A new email will be appended as current if not already in use by other user.
 If the email was already used by the same user, will me marked as current.
 ```
