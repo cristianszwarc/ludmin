@@ -83,6 +83,7 @@ Content-Type: application/json
 ```
 
 **Update user's details**
+
 User can update itself using `me` as the id, and master users can update anyone.
 
 Note: All the following examples can be used in the same call.
