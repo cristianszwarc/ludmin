@@ -72,6 +72,54 @@ GET /users
 Content-Type: application/json
 ```
 
+**User Profile**
+
+Load user's details:
+- user's full name is displayed to other users
+- complete profile shown to users using `me` and to master users
+```
+GET /users/<user_id|me>
+Content-Type: application/json
+```
+
+**Update user's details**
+User can update itself using `me` as the id, and master users can update anyone.
+
+Note: All the following examples can be used in the same call.
+
+*Basic*
+```
+PUT /users/<user_id|me>
+Content-Type: application/json
+{
+    "full_name": "My new name"
+}
+```
+
+*email*
+A new email will be appended as current if not already in use by other user.
+If the email was already used by the same user, will me marked as current.
+```
+PUT /users/<user_id|me>
+Content-Type: application/json
+{
+    "email": "new@email.com",
+    "current_password": "theCurrentPassword"
+}
+```
+
+*password*
+```
+PUT /users/<user_id|me>
+Content-Type: application/json
+{
+    "password": "123123",
+    "password_confirmation": "123123",
+    "current_password": "theCurrentPassword"
+}
+```
+
+
 Installation
 ----------------
 #### Install environment ####

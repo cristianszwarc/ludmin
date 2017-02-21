@@ -1,17 +1,17 @@
 from flask import Blueprint, g
 from flask_restful import Api, Resource, reqparse
 from flask_pymongo import ObjectId
-from datetime import datetime, timedelta
-from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
+from werkzeug.security import check_password_hash
 from flask_restful.utils import cors
 import uuid
 
-from .token import Token
 from .. import mongo
 
 tokens_bp = Blueprint('tokens_api', __name__)
 api = Api(tokens_bp)
-api.decorators=[cors.crossdomain(origin='*', headers=['accept', 'Content-Type'])]
+api.decorators = [cors.crossdomain(origin='*', headers=['accept', 'Content-Type'])]
+
 
 class PublicTokensResource(Resource):
     def options(self):
@@ -19,7 +19,6 @@ class PublicTokensResource(Resource):
 
     def post(self):
         """ Public token for a device, when not device id provided, generate a random one """
-        device_id =  None
 
         parser = reqparse.RequestParser()
         parser.add_argument('device_id', required=True)
@@ -31,7 +30,8 @@ class PublicTokensResource(Resource):
             device_id = uuid.uuid4().hex
 
         public_token = g.token.generate_public(device_id, ['public'])
-        return {'success': True, 'device_id': device_id, 'token': public_token.decode('utf-8') }
+        return {'success': True, 'device_id': device_id, 'token': public_token.decode('utf-8')}
+
 
 class TokensResource(Resource):
     def options(self):
@@ -64,7 +64,7 @@ class TokensResource(Resource):
             user_for_device = mongo.db.users.find_one({
                 '_id': ObjectId(user_id),
                 'devices': {
-                    '$elemMatch': { 'device_id': device_id }
+                    '$elemMatch': {'device_id': device_id}
                 }})
 
             # if this device still attached to the user, issue new token
@@ -73,7 +73,7 @@ class TokensResource(Resource):
                 current_date_time = datetime.now()
                 mongo.db.users.update({
                     '_id': user_for_device.get('_id'), 'devices.device_id': device_id},
-                    { '$set': { 'devices.$.lastUsed': current_date_time.strftime('%Y-%m-%d %H:%M:%S') } },
+                    {'$set': {'devices.$.lastUsed': current_date_time.strftime('%Y-%m-%d %H:%M:%S')}},
                     True
                 )
 
@@ -91,7 +91,7 @@ class TokensResource(Resource):
     def post(self):
         """Login, generates a new token"""
         if not g.token.has_access('public'):
-            return { 'error': 'Not allowed' }, 401
+            return {'error': 'Not allowed'}, 401
 
         device_id = g.token.decoded.get('device_id')
 
@@ -113,13 +113,13 @@ class TokensResource(Resource):
             })
 
         if not user:
-            return { 'error': 'Incorrect user or password' }, 401
+            return {'error': 'Incorrect user or password'}, 401
 
-        current_password = next((item for item in user.get('passwords') if item.get('current') == True), None)
+        current_password = next((item for item in user.get('passwords') if item.get('current') is True), None)
 
         # check if the given password is correct
         if not current_password or not check_password_hash(current_password.get('password'), data.get('password')):
-            return { 'error': 'Incorrect user or password' }, 401
+            return {'error': 'Incorrect user or password'}, 401
 
         user_devices = user.get('devices') or []        # get current user's devices
         if not any(device.get('device_id') == device_id for device in user_devices):
@@ -164,14 +164,14 @@ class TokensResource(Resource):
             user_for_device = mongo.db.users.find_one({
                 '_id': ObjectId(_id),
                 'devices': {
-                    '$elemMatch': { 'device_id': device_id }
+                    '$elemMatch': {'device_id': device_id}
                 }})
 
             # if the device still attached to the user, remove it
             if user_for_device:
                 mongo.db.users.update(
                     {'_id': user_for_device.get('_id')},
-                    { '$pull': { "devices" : { 'device_id': device_id } } },
+                    {'$pull': {"devices": {'device_id': device_id}}},
                     True
                 )
 

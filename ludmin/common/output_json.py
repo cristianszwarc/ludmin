@@ -1,6 +1,7 @@
 from flask import make_response
 from bson.json_util import dumps
 
+
 # http://blog.alienretro.com/using-mongodb-with-flask-restful/
 def output_json(obj, code, headers=None):
     """

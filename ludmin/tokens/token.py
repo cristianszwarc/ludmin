@@ -1,14 +1,14 @@
-import jwt;
+import jwt
 from datetime import datetime, timedelta
 
-# SECRET_KEY TOKEN_TIMEOUT are required inside the config
+
 class Token:
     """Token functions"""
     def __init__(self, config, token):
         if token:
             token = token.replace("Bearer", "").strip()
         self.token = token              # store the token
-        self.config = config              # store the token
+        self.config = config            # store the token
         self.decoded = self.decode()    # decode it as soon it arrives
 
         if not self.config['SECRET_KEY']:
@@ -20,11 +20,11 @@ class Token:
             print('Warning: TOKEN_TIMEOUT not in config file!!!')
 
     # decode the token or throw exception
-    def decode_token_or_fail(self, verify_exp = True):
+    def decode_token_or_fail(self, verify_exp=True):
         return jwt.decode(
                 self.token,
                 self.config['SECRET_KEY'],
-                options={ 'verify_exp': verify_exp },
+                options={'verify_exp': verify_exp},
                 algorithms=['HS256']
             )
 

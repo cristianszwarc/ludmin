@@ -8,6 +8,7 @@ from .tokens.token import Token
 # Flask extensions
 mongo = PyMongo()
 
+
 def create_app(config_name=None):
     if config_name is None:
         config_name = os.environ.get('LUDMIN_CONFIG', 'development')
