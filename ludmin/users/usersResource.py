@@ -6,7 +6,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask import g
 from .. import mongo
 
+
 class UsersResource(Resource):
+    def options(self):
+        pass
+
     def get(self):
         """ List users """
 

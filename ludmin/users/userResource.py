@@ -8,6 +8,9 @@ from .. import mongo
 
 
 class UserResource(Resource):
+    def options(self):
+        pass
+
     def get(self, user_id):
         """ User profile """
 
@@ -151,7 +154,7 @@ class UserResource(Resource):
 
         # password is being updated
         if data.get('password'):
-            # email change requires current password
+            # password change requires current password
             if not verified_pass:
                 return {'error': 'Unable to verify current password.'}, 401
 
@@ -171,17 +174,17 @@ class UserResource(Resource):
                 })
 
             # mark the current password
-            for passToUnflag in user_passwords:
-                is_current = check_password_hash(passToUnflag.get('password'), data.get('password'))
+            for pass_to_unflag in user_passwords:
+                is_current = check_password_hash(pass_to_unflag.get('password'), data.get('password'))
 
                 # is not the current but was already used, update hash
-                if is_current != passToUnflag.get('current'):
-                    passToUnflag.update({
+                if is_current != pass_to_unflag.get('current'):
+                    pass_to_unflag.update({
                             'updatedAt': current_date_time.strftime('%Y-%m-%d %H:%M:%S'),
                         })
 
                 # mark current or not
-                passToUnflag.update({
+                pass_to_unflag.update({
                         'current': is_current
                     })
 

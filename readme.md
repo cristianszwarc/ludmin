@@ -8,7 +8,7 @@ Use
 ----------------
 
 **Public Token**
-
+All requests require a token, if the user is not logged-in then a public token must be used.
 get a public JWT token for a device (if device_id is not 32 chars, a device id will be generated, this is not stored anywhere)
 ```
 POST /tokens/public
@@ -42,7 +42,8 @@ Authorization: <token>
 
 **Logout**
 
-The device will be logged-out from the user's account
+The device will be logged-out from the user's account.
+`device_id` can be any of the devices linked to the logged-in user.
 ```
 DELETE /tokens/<device_id>
 Content-Type: application/json
@@ -121,6 +122,32 @@ Content-Type: application/json
 }
 ```
 
+**Reset Password**
+
+Create a reset code (does not send anything, a task should send the codes and removed expired ones).
+
+```
+POST /users/reset
+Content-Type: application/json
+Authorization: <token>
+{
+  "email": "some@email.net"
+} 
+```
+
+Set a new password by using the reset code.
+
+```
+PUT /users/reset
+Content-Type: application/json
+Authorization: <token>
+{
+  "email": "some@email.net",
+  "code": "1234",
+  "password" : "123123",
+  "password_confirmation" : "123123"
+} 
+```
 
 Installation
 ----------------

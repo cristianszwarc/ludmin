@@ -148,34 +148,34 @@ class TokensResource(Resource):
 
         try:
             # the decoded token may be expired, decode it ignoring the expiration
+            # it's ok to logout with an expired token when the device matches the token.device_id
             token_to_refresh = g.token.decode_token_or_fail(verify_exp=False)
 
-            # only accept the token's user_id if the device id from the url matches the one in the token
-            if device_id == token_to_refresh.get('device_id'):
-                _id = g.token.decoded.get('_id')
-            else:
-                return {'error': 'Inconsistent device id'}, 500
+            # the device_id is not from the current token, validate expiration
+            # the user is allowed to logout other devices
+            if device_id != token_to_refresh.get('device_id'):
+                token_to_refresh = g.token.decode_token_or_fail()
 
         except Exception:
             return {'error': 'Invalid Token'}, 500
 
-        # if we have an user and a device (we should)
-        if _id and device_id:
-            user_for_device = mongo.db.users.find_one({
-                '_id': ObjectId(_id),
-                'devices': {
-                    '$elemMatch': {'device_id': device_id}
-                }})
+        # check that the device_id exist and belongs to the current user
+        user_for_device = mongo.db.users.find_one({
+            '_id': ObjectId(token_to_refresh.get('_id')),
+            'devices': {
+                '$elemMatch': {'device_id': device_id}
+            }})
 
-            # if the device still attached to the user, remove it
-            if user_for_device:
-                mongo.db.users.update(
-                    {'_id': user_for_device.get('_id')},
-                    {'$pull': {"devices": {'device_id': device_id}}},
-                    True
-                )
+        # if the device is attached to the user, remove it
+        if user_for_device:
+            mongo.db.users.update(
+                {'_id': user_for_device.get('_id')},
+                {'$pull': {"devices": {'device_id': device_id}}},
+                True
+            )
+            return {'success': True}
 
-        return {'success': True}
+        return {'error': 'Device not linked to user.'}
 
 api.add_resource(TokensResource, '', '/<string:device_id>')
 api.add_resource(PublicTokensResource, '', '/public')
