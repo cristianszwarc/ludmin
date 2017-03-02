@@ -1,5 +1,5 @@
 import jwt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 
 class Token:
@@ -47,7 +47,7 @@ class Token:
 
     def generate(self, payload):
         # append default expiration time
-        payload['exp'] = datetime.utcnow() + timedelta(seconds=self.config['TOKEN_TIMEOUT'])
+        payload['exp'] = datetime.now(timezone.utc) + timedelta(seconds=self.config['TOKEN_TIMEOUT'])
         return jwt.encode(payload, self.config['SECRET_KEY'], algorithm='HS256')
 
     def generate_public(self, device_id, allowed):

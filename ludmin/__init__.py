@@ -39,7 +39,7 @@ def create_app(config_name=None):
     @app.before_request
     def global_validations():
         # check the body is not empty when not using GET/DELETE
-        if request.method != 'GET' and request.method != 'DELETE' and not request.get_json():
+        if request.method != 'GET' and request.method != 'DELETE' and request.method != 'OPTIONS' and not request.get_json():
             return jsonify({"error": "Invalid request."})
 
         # store the token for this request (when available)
@@ -53,5 +53,13 @@ def create_app(config_name=None):
             except Exception as e:
                 # immediate fail for any issue with the token
                 return jsonify({'error': str(e)}), 500
+
+    # hack
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+        return response
 
     return app

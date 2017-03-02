@@ -10,8 +10,7 @@ from .. import mongo
 
 tokens_bp = Blueprint('tokens_api', __name__)
 api = Api(tokens_bp)
-api.decorators = [cors.crossdomain(origin='*', headers=['accept', 'Content-Type'])]
-
+#api.decorators = [cors.crossdomain(origin='*', headers=['accept', 'Content-Type', 'Authorization'])]
 
 class PublicTokensResource(Resource):
     def options(self):
