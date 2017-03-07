@@ -33,7 +33,7 @@ class PublicTokensResource(Resource):
 
 
 class TokensResource(Resource):
-    def options(self):
+    def options(self, device_id=None):
         pass
     
     def get(self, device_id):
@@ -112,13 +112,13 @@ class TokensResource(Resource):
             })
 
         if not user:
-            return {'error': 'Incorrect user or password'}, 401
+            return {'error': 'Incorrect user or password'}, 400
 
         current_password = next((item for item in user.get('passwords') if item.get('current') is True), None)
 
         # check if the given password is correct
         if not current_password or not check_password_hash(current_password.get('password'), data.get('password')):
-            return {'error': 'Incorrect user or password'}, 401
+            return {'error': 'Incorrect user or password'}, 400
 
         user_devices = user.get('devices') or []        # get current user's devices
         if not any(device.get('device_id') == device_id for device in user_devices):

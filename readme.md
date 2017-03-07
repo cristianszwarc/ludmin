@@ -24,7 +24,7 @@ get a logged-in JWT token
 ```
 POST /tokens
 Content-Type: application/json
-Authorization: <token>
+Authorization: Bearer <token>
 {
   "email": "some@email.net",
   "password" : "123123",

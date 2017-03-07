@@ -60,6 +60,6 @@ class Token:
         return self.generate({
             'device_id': device_id,
             '_id': str(user_for_device.get('_id')),
-            'email': user_for_device.get('email'),
+            'full_name': user_for_device.get('full_name'),
             'allowed': allowed
         })
