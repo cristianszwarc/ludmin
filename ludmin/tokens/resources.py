@@ -3,7 +3,7 @@ from flask_restful import Api, Resource, reqparse
 from flask_pymongo import ObjectId
 from datetime import datetime
 from werkzeug.security import check_password_hash
-from flask_restful.utils import cors
+#from flask_restful.utils import cors
 import uuid
 
 from .. import mongo

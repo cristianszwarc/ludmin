@@ -8,7 +8,7 @@ from .. import mongo
 
 
 class UserResource(Resource):
-    def options(self):
+    def options(self, user_id):
         pass
 
     def get(self, user_id):
@@ -27,7 +27,7 @@ class UserResource(Resource):
         try:
             user = mongo.db.users.find_one({
                     '_id': ObjectId(user_id)
-                }, {'_id': 0, 'passwords.password': 0})
+                }, {'passwords.password': 0})
         except Exception:
             return {'error': 'Error loading user'}, 404
 
@@ -39,6 +39,7 @@ class UserResource(Resource):
             return {
                 'success': True,
                 'profile': {
+                    'user_id': str(user.get('_id')),
                     'full_name': user.get('full_name')
                 }
             }
@@ -49,6 +50,7 @@ class UserResource(Resource):
         return {
             'success': True,
             'profile': {
+                'user_id': str(user.get('_id')),
                 'full_name': user.get('full_name'),
                 'current_email': current_email.get('email'),
                 'devices': user.get('devices'),

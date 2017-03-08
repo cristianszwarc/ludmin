@@ -47,7 +47,7 @@ def create_app(config_name=None):
 
         # validate the token for any route that is not requesting a new token
         rule = request.url_rule
-        if rule and '/token' not in rule.rule:
+        if request.method != 'OPTIONS' and rule and '/token' not in rule.rule:
             try:
                 g.token.decode_token_or_fail()
             except Exception as e:
