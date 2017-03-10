@@ -89,7 +89,7 @@ class TokensResource(Resource):
 
     def post(self):
         """Login, generates a new token"""
-        if not g.token.has_access('public'):
+        if not g.token.has_access('public') and not g.token.has_access('basics'):
             return {'error': 'Not allowed'}, 401
 
         device_id = g.token.decoded.get('device_id')

@@ -53,12 +53,14 @@ class Token:
     def generate_public(self, device_id, allowed):
         return self.generate({
                 'device_id': device_id,
+                'type': 'public',
                 'allowed': allowed,
             })
 
     def generate_logged(self, user_for_device, device_id, allowed):
         return self.generate({
             'device_id': device_id,
+            'type': 'logged',
             '_id': str(user_for_device.get('_id')),
             'full_name': user_for_device.get('full_name'),
             'allowed': allowed
