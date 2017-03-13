@@ -1,7 +1,7 @@
 from flask import Blueprint, g
 from flask_restful import Api, Resource, reqparse
 from flask_pymongo import ObjectId
-from datetime import datetime
+from datetime import datetime, timezone
 from werkzeug.security import check_password_hash
 #from flask_restful.utils import cors
 import uuid
@@ -77,7 +77,7 @@ class TokensResource(Resource):
             # if this device still attached to the user, issue new token
             if user_for_device:
                 # update device's lastUsed and rev
-                current_date_time = datetime.now()
+                current_date_time = datetime.now(timezone.utc)
                 mongo.db.users.update({
                     '_id': user_for_device.get('_id'), 'devices.device_id': device_id},
                     {'$set': {
@@ -136,7 +136,7 @@ class TokensResource(Resource):
         user_devices = user.get('devices') or []        # get current user's devices
         if not any(device.get('device_id') == device_id for device in user_devices):
             # the device is not included for this user
-            current_date_time = datetime.now()
+            current_date_time = datetime.now(timezone.utc)
             user_devices.append({
                 'device_id': device_id,
                 'rev': rev,
@@ -147,7 +147,7 @@ class TokensResource(Resource):
             mongo.db.users.save(user)
         else:
             # device exist for this user, need to update rev and lastUsed
-            current_date_time = datetime.now()
+            current_date_time = datetime.now(timezone.utc)
             mongo.db.users.update({
                 '_id': user.get('_id'), 'devices.device_id': device_id},
                 {'$set': {

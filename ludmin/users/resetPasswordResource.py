@@ -1,5 +1,5 @@
 from flask_restful import Resource, reqparse
-from datetime import datetime
+from datetime import datetime, timezone
 from werkzeug.security import generate_password_hash, check_password_hash
 import random
 
@@ -44,7 +44,7 @@ class ResetPasswordResource(Resource):
             return {'error': 'Email not registered for any user.'}, 400
 
         # generate a reset password record
-        current_date_time = datetime.now()
+        current_date_time = datetime.now(timezone.utc)
         generated_code = random.randint(1000, 9999)
         new_reset = {
             'email': data.get('email'),
@@ -63,7 +63,7 @@ class ResetPasswordResource(Resource):
         if not g.token.has_access('public'):
             return {'error': 'Not allowed'}, 401
 
-        current_date_time = datetime.now()
+        current_date_time = datetime.now(timezone.utc)
 
         # validate fields
         parser = reqparse.RequestParser()

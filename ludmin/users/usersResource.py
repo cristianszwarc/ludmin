@@ -1,6 +1,6 @@
 from flask_restful import Resource, reqparse
 from flask_pymongo import ObjectId
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from flask import g
@@ -48,7 +48,7 @@ class UsersResource(Resource):
             return { 'error': 'Email already in use' }, 400
 
         # create user
-        current_date_time = datetime.now()
+        current_date_time = datetime.now(timezone.utc)
         new_user = {
             'full_name': data.get('full_name'),
             'emails': [
