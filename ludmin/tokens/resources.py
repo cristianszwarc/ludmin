@@ -5,6 +5,7 @@ from datetime import datetime
 from werkzeug.security import check_password_hash
 #from flask_restful.utils import cors
 import uuid
+import random
 
 from .. import mongo
 
@@ -50,6 +51,7 @@ class TokensResource(Resource):
             # only accept the token's user_id if the device id from the url matches the one in the token
             if device_id == token_to_refresh.get('device_id'):
                 user_id = token_to_refresh.get('_id')
+                token_rev = token_to_refresh.get('rev')
             else:
                 return {'error': 'Inconsistent device id'}, 500
 
@@ -57,28 +59,37 @@ class TokensResource(Resource):
             # we require a token to be refreshed, even a public one
             return {'error': 'Invalid Token'}, 500
 
+        # random version for this token
+        rev = random.randint(0, 9999)
+
         # if we have a token owner and a device, check if the device still attached to the user
         # we are going to have an user_id only if a logged-in token was provided (despite expired)
         if user_id and device_id:
             user_for_device = mongo.db.users.find_one({
                 '_id': ObjectId(user_id),
                 'devices': {
-                    '$elemMatch': {'device_id': device_id}
+                    '$elemMatch': {
+                        'device_id': device_id,
+                        'rev': token_rev
+                    }
                 }})
 
             # if this device still attached to the user, issue new token
             if user_for_device:
-                # update device's lastUsed
+                # update device's lastUsed and rev
                 current_date_time = datetime.now()
                 mongo.db.users.update({
                     '_id': user_for_device.get('_id'), 'devices.device_id': device_id},
-                    {'$set': {'devices.$.lastUsed': current_date_time.strftime('%Y-%m-%d %H:%M:%S')}},
+                    {'$set': {
+                        'devices.$.lastUsed': current_date_time.strftime('%Y-%m-%d %H:%M:%S'),
+                        'devices.$.rev': rev,
+                    }},
                     True
                 )
 
                 # issue fresh token
                 token_type = 'Refresh'
-                new_token = g.token.generate_logged(user_for_device, device_id, ['basics', 'master'])
+                new_token = g.token.generate_logged(user_for_device, device_id, ['basics', 'master'], rev)
 
         # if a new token was not created, issue a new public token by default
         if not new_token:
@@ -120,20 +131,34 @@ class TokensResource(Resource):
         if not current_password or not check_password_hash(current_password.get('password'), data.get('password')):
             return {'error': 'Incorrect user or password'}, 400
 
+        # random version for this token
+        rev = random.randint(0, 9999)
         user_devices = user.get('devices') or []        # get current user's devices
         if not any(device.get('device_id') == device_id for device in user_devices):
             # the device is not included for this user
             current_date_time = datetime.now()
             user_devices.append({
                 'device_id': device_id,
+                'rev': rev,
                 'lastUsed': current_date_time.strftime('%Y-%m-%d %H:%M:%S'),
                 'description': data.get('description')
             })
             user.update({'devices': user_devices})
             mongo.db.users.save(user)
+        else:
+            # device exist for this user, need to update rev and lastUsed
+            current_date_time = datetime.now()
+            mongo.db.users.update({
+                '_id': user.get('_id'), 'devices.device_id': device_id},
+                {'$set': {
+                    'devices.$.lastUsed': current_date_time.strftime('%Y-%m-%d %H:%M:%S'),
+                    'devices.$.rev': rev,
+                }},
+                True
+            )
 
         # generate logged-in JWT
-        encoded = g.token.generate_logged(user, device_id, ['basics', 'master'])
+        encoded = g.token.generate_logged(user, device_id, ['basics', 'master'], rev)
 
         # return the logged-in token
         return {

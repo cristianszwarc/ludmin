@@ -57,11 +57,12 @@ class Token:
                 'allowed': allowed,
             })
 
-    def generate_logged(self, user_for_device, device_id, allowed):
+    def generate_logged(self, user_for_device, device_id, allowed, rev):
         return self.generate({
             'device_id': device_id,
             'type': 'logged',
             '_id': str(user_for_device.get('_id')),
+            'rev': rev,
             'full_name': user_for_device.get('full_name'),
             'allowed': allowed
         })
